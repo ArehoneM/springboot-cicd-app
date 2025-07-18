@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>SpringBoot App by Charlotte 🚀</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"/>
+    <link th:href="@{/css/main.css?{id}(id=${timestamp})}" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #e6f0ff;
+            color: #003366;
+        }
+
+        .starter-template {
+            padding-top: 100px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #0056b3;
+        }
+
+        p {
+            font-size: 1.25rem;
+        }
+
+        .navbar {
+            background-color: #0056b3 !important;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark">
+    <a class="navbar-brand" href="#">CI/CD in Action</a>
+</nav>
+
+<main role="main" class="container">
+    <div class="__mainSection">
+        <h1 th:text="${title}">Welcome to CI/CD Pipeline!</h1>
+        <p th:text="${msg}">Deployed via Jenkins, Scanned by SonarQube, Delivered by Argo CD on Kubernetes 💙</p>
+    </div>
+</main>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

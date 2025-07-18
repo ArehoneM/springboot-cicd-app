@@ -1,0 +1,23 @@
+
+body {
+    background-color: #e6f0ff;
+    color: #003366;
+    padding-top: 5rem;
+}
+
+.__mainSection{
+    padding-top: 100px;
+    text-align: center;
+}
+
+h1 {
+    color: #0056b3;
+}
+
+p {
+    font-size: 1.25rem;
+}
+
+.navbar {
+    background-color: #0056b3 !important;
+}
