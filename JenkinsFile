@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    label 'master'
-  }
+  agent any
 
   environment {
     SONAR_URL = "http://54.91.129.115:9000"
