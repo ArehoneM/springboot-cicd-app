@@ -1,0 +1,66 @@
+pipeline {
+  agent any
+
+  environment {
+    SONAR_URL = "http://34.201.116.83:9000"
+    DOCKER_IMAGE = "charlotte101/springboot-cicd:${BUILD_NUMBER}"
+    REGISTRY_CREDENTIALS = credentials('docker-cred')
+  }
+
+  stages {
+    stage('Checkout CI Repo') {
+      steps {
+        git branch: 'main', url: 'https://github.com/ArehoneM/springboot-cicd-app.git'
+      }
+    }
+
+    stage('Build and Test') {
+      steps {
+        sh 'ls -ltr'
+        sh 'mvn clean package'
+      }
+    }
+
+    stage('Static Code Analysis') {
+      steps {
+        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+          sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+        }
+      }
+    }
+
+    stage('Build and Push Docker Image') {
+      steps {
+        script {
+          sh 'docker build -t ${DOCKER_IMAGE} .'
+          def dockerImage = docker.image("${DOCKER_IMAGE}")
+          docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+
+    stage('Checkout Deployment Repo & Update Image Tag') {
+      environment {
+        GIT_REPO_NAME = "springboot-cicd-deploy"
+        GIT_USER_NAME = "ArehoneM"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+          sh '''
+            rm -rf ${GIT_REPO_NAME}
+            git clone https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git
+            cd ${GIT_REPO_NAME}
+            git config user.email "arehonecharlotte@gmail.com"
+            git config user.name "Arehone Charlotte Mudau"
+            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment.yml
+            git add deployment.yml
+            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+            git push origin main
+          '''
+        }
+      }
+    }
+  }
+}
